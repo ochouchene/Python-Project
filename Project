@@ -1,0 +1,86 @@
+import math
+
+# Step 1: Define the Calculator class
+class Calculator:
+    def __init__(self):
+        # Initialize dictionary with basic operations
+        self.operations = {
+            '+': lambda x, y: x + y,
+            '-': lambda x, y: x - y,
+            '*': lambda x, y: x * y,
+            '/': self.safe_divide
+        }
+
+    def safe_divide(self, x, y):
+        if y == 0:
+            raise ValueError("Error: Division by zero!")
+        return x / y
+
+    def add_operation(self, symbol, func):
+        self.operations[symbol] = func
+
+    def calculate(self, num1, symbol, num2=None):
+        # Check if symbol exists
+        if symbol not in self.operations:
+            raise ValueError(f"Invalid operation: {symbol}")
+
+        # Check if inputs are numbers
+        if not isinstance(num1, (int, float)):
+            raise TypeError(f"Invalid input: {num1} is not a number")
+        if num2 is not None and not isinstance(num2, (int, float)):
+            raise TypeError(f"Invalid input: {num2} is not a number")
+
+        # Perform the calculation
+        if num2 is None:
+            return self.operations[symbol](num1)  # For unary operations
+        return self.operations[symbol](num1, num2)
+
+
+# Step 2: Define advanced operations
+def exponent(x, y):
+    return x ** y
+
+def square_root(x):
+    if x < 0:
+        raise ValueError("Error: Cannot take square root of negative number")
+    return math.sqrt(x)
+
+def logarithm(x, base=math.e):
+    if x <= 0:
+        raise ValueError("Error: Logarithm undefined for non-positive values")
+    return math.log(x, base)
+
+
+# Step 3: Create calculator instance and add advanced operations
+calc = Calculator()
+calc.add_operation('^', exponent)
+calc.add_operation('sqrt', square_root)
+calc.add_operation('log', logarithm)
+
+
+# Step 4: Main program loop
+while True:
+    try:
+        print("\nAvailable operations: +, -, *, /, ^, sqrt, log")
+        symbol = input("Enter operation (or 'exit' to quit): ").strip()
+        if symbol.lower() == 'exit':
+            print("Exiting calculator. Goodbye!")
+            break
+
+        if symbol in ['sqrt', 'log']:
+            num1 = float(input("Enter number: "))
+            if symbol == 'log':
+                base = input("Enter logarithm base (press Enter for natural log): ").strip()
+                base = float(base) if base else math.e
+                result = calc.calculate(num1, symbol, base)
+            else:
+                result = calc.calculate(num1, symbol)
+        else:
+            num1 = float(input("Enter first number: "))
+            num2 = float(input("Enter second number: "))
+            result = calc.calculate(num1, symbol, num2)
+
+        print(f"Result: {result}")
+
+    except Exception as e:
+        print(e)
